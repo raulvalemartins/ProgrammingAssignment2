@@ -33,14 +33,13 @@ cacheSolve <- function(x, ...) {
         
         if (identical(originalData, data )) {
                 m <- originalObject$getInverse()
-                print("getting cached data 1")
+                message("getting cached data")
                 return(m)
         } else
         {
                 m <- x$getInverse()
                 if(!is.null(m) ) {
-                        ##       ##message("getting cached data")
-                        print("getting cached data2 ")
+                        message("getting cached data")
                         originalData <<- data
                         originalObject <<- x
                         return(m)
