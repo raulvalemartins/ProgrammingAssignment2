@@ -37,19 +37,27 @@ makeCacheMatrix <- function( x = matrix()) {
         ## the 'makeCacheMatrix' function creates a special object
         ## that stores a matrix and cache's its inverse
         
-        i <- NULL
-
-        setMatrix <- function (y = NULL)  {
-                lastMatrix <<- x
-                x <<- y
+        inverse <- NULL
+        parametersList <- list()
+        
+        setMatrix <- function ( y = matrix() )  {
+                
+                if ( !identical( x, y ) ){ ## if the new matrix is different all 
+                                           ## the cached values must be reseted 
+                        x <<- y
+                        inverse <<- NULL
+                        parametersList <- list()
+                }
+                
         }
         getMatrix <- function () x
-        getLastMatrix <- function () lastMatrix
-        getInverse <- function () i
-        setInverse <- function (inverse) i <<- inverse
+        getInverse <- function () inverse
+        setInverse <- function ( i ) inverse <<- i
+        setParameters <- function( p ) parametersList <<- p
+        getParameters <- function() parametersList
         list(setMatrix = setMatrix, getMatrix = getMatrix, 
-             getLastMatrix = getLastMatrix, 
-             getInverse = getInverse, setInverse = setInverse )
+             getInverse = getInverse, setInverse = setInverse, 
+             setParameters = setParameters, getParameters = getParameters )
 }
 
 cacheSolve <- function(x, ...) { 
@@ -57,18 +65,19 @@ cacheSolve <- function(x, ...) {
         ## the 'cacheSolve' function calculates de inverse matrix create by the 
         ## 'makeCacheMatrix'. Before the calculation proceds this function 
         ## checks to see if the inverse has already been calculated and at 
-        ## same time if the content of the matrix is the same. 
+        ## same time if the call conditions are the same (including the parameters list). 
           
         m <- x$getInverse()
-        if(!is.null(m) && identical(x$getMatrix(), x$getLastMatrix())) {
+        if( !is.null(m) & identical( list(...), x$getParameters() ) ) {
                 
                 message("getting cached data")
                 return(m)
         }
         
         data <- x$getMatrix()
-        m <- solve(data, ...)
-        x$setInverse(m)
-        x$setMatrix (data)
+        m <- solve( data, ... )
+        x$setInverse( m )
+        x$setMatrix ( data )
+        x$setParameters( list(...) )
         m
 }
